@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom'
 
 import LatestMatch from '../LatestMatch'
 import MatchCard from '../MatchCard'
+import MatchStatsPieChart from '../MatchStatsPieChart'
 
 import './index.css'
 
@@ -40,12 +41,32 @@ class TeamMatches extends Component {
 
     const response = await fetch(`${teamMatchesApiUrl}${id}`)
     const fetchedData = await response.json()
+
+    // Count wins, losses, draws
+    let wins = 0
+    let losses = 0
+    let draws = 0
+    fetchedData.recent_matches.forEach(eachItem => {
+      if (eachItem.match_status === 'Won') {
+        wins += 1
+      } else if (eachItem.match_status === 'Lost') {
+        losses += 1
+      } else {
+        draws += 1
+      }
+    })
+
     const formattedData = {
       teamBannerURL: fetchedData.team_banner_url,
       latestMatch: this.getFormattedData(fetchedData.latest_match_details),
       recentMatches: fetchedData.recent_matches.map(eachMatch =>
         this.getFormattedData(eachMatch),
       ),
+      matchStats: [
+        {name: 'Wins', value: wins},
+        {name: 'Losses', value: losses},
+        {name: 'Draws', value: draws},
+      ],
     }
 
     this.setState({teamMatchesData: formattedData, isLoading: false})
@@ -66,7 +87,7 @@ class TeamMatches extends Component {
 
   renderTeamMatches = () => {
     const {teamMatchesData} = this.state
-    const {teamBannerURL, latestMatch} = teamMatchesData
+    const {teamBannerURL, latestMatch, matchStats} = teamMatchesData
 
     return (
       <div className="responsive-container">
@@ -75,6 +96,10 @@ class TeamMatches extends Component {
         </Link>
         <img src={teamBannerURL} alt="team banner" className="team-banner" />
         <LatestMatch latestMatchData={latestMatch} />
+
+        {/* ✅ Pie Chart */}
+        <MatchStatsPieChart data={matchStats} />
+
         {this.renderRecentMatchesList()}
       </div>
     )
