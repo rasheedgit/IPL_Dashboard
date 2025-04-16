@@ -1,5 +1,6 @@
 import {Component} from 'react'
 import Loader from 'react-loader-spinner'
+import {Link} from 'react-router-dom'
 
 import LatestMatch from '../LatestMatch'
 import MatchCard from '../MatchCard'
@@ -69,6 +70,9 @@ class TeamMatches extends Component {
 
     return (
       <div className="responsive-container">
+        <Link to="/">
+          <button type="button">Back</button>
+        </Link>
         <img src={teamBannerURL} alt="team banner" className="team-banner" />
         <LatestMatch latestMatchData={latestMatch} />
         {this.renderRecentMatchesList()}
